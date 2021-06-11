@@ -200,33 +200,43 @@ func addElement(k string, v interface{}) *element {
 		// unsupported
 		fmt.Println("Ptr")
 	case reflect.Slice:
-		sliceVal := v.([]interface{})[0]
+		sliceVals := v.([]interface{})
 
-		srt := reflect.TypeOf(sliceVal)
-		switch srt.Kind() {
-		case reflect.String:
-			elem = element{
-				ValType: "slice-strings",
-				Key:     k,
-				Comment: expandColonSpace(comment),
-			}
+		if len(sliceVals) > 0 {
+			sliceVal := sliceVals[0]
 
-			for _, i := range v.([]interface{}) {
-				parentElem := addElement("parent", i)
-				parentElem.Parent = true
-				elem.Elements = append(elem.Elements, *parentElem)
+			srt := reflect.TypeOf(sliceVal)
+			switch srt.Kind() {
+			case reflect.String:
+				elem = element{
+					ValType: "slice-strings",
+					Key:     k,
+					Comment: expandColonSpace(comment),
+				}
+
+				for _, i := range v.([]interface{}) {
+					parentElem := addElement("parent", i)
+					parentElem.Parent = true
+					elem.Elements = append(elem.Elements, *parentElem)
+				}
+			default:
+				elem = element{
+					ValType: "slice-interfaces",
+					Key:     k,
+					Comment: expandColonSpace(comment),
+				}
+
+				for _, i := range v.([]interface{}) {
+					parentElem := addElement("parent", i)
+					parentElem.Parent = true
+					elem.Elements = append(elem.Elements, *parentElem)
+				}
 			}
-		default:
+		} else {
 			elem = element{
 				ValType: "slice-interfaces",
 				Key:     k,
 				Comment: expandColonSpace(comment),
-			}
-
-			for _, i := range v.([]interface{}) {
-				parentElem := addElement("parent", i)
-				parentElem.Parent = true
-				elem.Elements = append(elem.Elements, *parentElem)
 			}
 		}
 	case reflect.String:
