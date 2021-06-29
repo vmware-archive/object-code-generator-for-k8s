@@ -135,9 +135,9 @@ var {{ .VarName }} = &unstructured.Unstructured{
 			{{- end }}
 		{{- else if eq .Type "!!int" }}
 			{{- if ne .IsSeq true }}
-				int({{ .Value -}}),  {{ if .Comment }}// {{ .Comment }}{{ end }}
-			{{- else }}
 				"{{ .Key }}": int({{ .Value -}}),  {{ if .Comment }}// {{ .Comment }}{{ end }}
+			{{- else }}
+				int({{ .Value -}}),  {{ if .Comment }}// {{ .Comment }}{{ end }}
 			{{- end }}
 		{{- else if eq .Type "!!map" }}
 			{{- if ne .IsSeq true }}

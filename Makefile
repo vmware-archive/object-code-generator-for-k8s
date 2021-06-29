@@ -15,7 +15,7 @@ install: build
 	mv ocgk $(GOBIN)
 
 test:
-	go run test.go -manifest $(TEST_MANIFEST) -output $(TEST_OUTPUT)
+	go test -args -manifest=$(TEST_MANIFEST) -output=$(TEST_OUTPUT)
 
 test.run: test
 	go run $(TEST_OUTPUT)

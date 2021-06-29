@@ -14,28 +14,23 @@ import (
 	"github.com/vmware-tanzu-labs/object-code-generator-for-k8s/pkg/generate"
 )
 
+var manifestFile string
+
+var manifestPath = flag.String("manifest", "sample/deploy.yaml", "path to resource manifest")
+var outputPath = flag.String("output", "/tmp/kocg-test.go", "path to output go source code")
+
 type source struct {
 	Object string
 }
 
 func Test_main(t *testing.T) {
-	t.Parallel()
-
-	var manifestPath string
-
-	var outputPath string
-
-	flag.StringVar(&manifestPath, "manifest", "../../sample/deploy.yaml", "path to resource manifest")
-	flag.StringVar(&outputPath, "output", "/tmp/ocgk-test.go", "path to output go source code")
-
-	flag.Parse()
 
 	tpl, err := template.New("testTemplate").Parse(testTemplate)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	manifestYaml, err := ioutil.ReadFile(manifestPath)
+	manifestYaml, err := ioutil.ReadFile(*manifestPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +53,7 @@ func Test_main(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f, err := os.Create(outputPath)
+	f, err := os.Create(*outputPath)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -90,11 +85,11 @@ func main() {
 
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 
 	namespace := "default"
@@ -105,7 +100,7 @@ func main() {
 
 	result, err := client.Resource(deploymentRes).Namespace(namespace).Create(context.TODO(), deployment, metav1.CreateOptions{})
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	fmt.Printf("Created deployment %q.\n", result.GetName())
 }
