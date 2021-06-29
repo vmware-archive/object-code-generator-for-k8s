@@ -46,7 +46,7 @@ object and get source code for an unstructured Kubernetes object type.`,
 
 	generateCmd.Flags().StringVarP(
 		&r.Options.manifestFilepath,
-		"manifest-filepath",
+		"manifest-file",
 		"m",
 		"",
 		"path to manifest file containing resource definition",
