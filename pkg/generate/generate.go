@@ -14,12 +14,13 @@ import (
 )
 
 type element struct {
-	Type     string
-	Key      string
-	Value    string
-	IsSeq    bool
-	Comment  string
-	Elements elements
+	Type        string
+	Key         string
+	Value       string
+	IsSeq       bool
+	LineComment string
+	HeadComment string
+	Elements    elements
 }
 
 type object struct {
@@ -39,9 +40,10 @@ func (e *elements) UnmarshalYAML(value *yaml.Node) error {
 func (e *elements) decodeElements(factor int, value ...*yaml.Node) {
 	for i := 0; i < len(value); i += 1 + factor {
 		elem := element{
-			Type:    value[i+factor].ShortTag(),
-			Key:     value[i].Value,
-			Comment: strings.Trim(value[i+factor].LineComment, "#"),
+			Type:        value[i+factor].ShortTag(),
+			Key:         value[i].Value,
+			LineComment: strings.TrimPrefix(value[i+factor].LineComment, "#"),
+			HeadComment: strings.TrimPrefix(value[i].HeadComment, "#"),
 		}
 
 		switch value[i+factor].Kind {
@@ -64,7 +66,7 @@ func (e *elements) decodeElements(factor int, value ...*yaml.Node) {
 		case yaml.AliasNode:
 			elem.Type = value[i+factor].Alias.ShortTag()
 			elem.Value = value[i+factor].Alias.Value
-			elem.Comment = strings.Trim(value[i+factor].Alias.LineComment, "#")
+			elem.LineComment = strings.Trim(value[i+factor].Alias.LineComment, "#")
 			elem.Elements.decodeElements(1, value[i+factor].Alias.Content...)
 
 			*e = append(*e, elem)
@@ -136,6 +138,9 @@ var {{ .VarName }} = &unstructured.Unstructured{
 
 {{- define "element" }}
 	{{- range . }}
+		{{- if .HeadComment }}
+		// {{ .HeadComment }}
+		{{- end }}
 		{{- if eq .Type "!!null" }}
 			{{- if ne .IsSeq true }}
 				"{{ .Key }}": nil,
@@ -144,19 +149,19 @@ var {{ .VarName }} = &unstructured.Unstructured{
 			{{- end }}
 		{{- else if  or (eq .Type "!!bool") (eq .Type "!!int") }}
 			{{- if ne .IsSeq true }}
-				"{{ .Key }}": {{ .Value -}},  {{ if .Comment }}// {{ .Comment }}{{ end }}
+				"{{ .Key }}": {{ .Value -}},  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- else }}
-				{{ .Value -}},  {{ if .Comment }}// {{ .Comment }}{{ end }}
+				{{ .Value -}},  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- end }}
 		{{- else if eq .Type "!!str" }}
 			{{- if ne .IsSeq true }}
-				"{{ .Key }}": {{ escape .Value -}}  {{ if .Comment }}// {{ .Comment }}{{ end }}
+				"{{ .Key }}": {{ escape .Value -}}  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- else }}
-				{{ escape .Value -}}  {{ if .Comment }}// {{ .Comment }}{{ end }}
+				{{ escape .Value -}}  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- end }}
 		{{- else if eq .Type "!!map" }}
 			{{- if ne .IsSeq true }}
-				"{{ .Key }}": map[string]interface{}{  {{ if .Comment }}// {{ .Comment }}{{ end }}
+				"{{ .Key }}": map[string]interface{}{  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- else }}
 				{
 			{{- end }}
