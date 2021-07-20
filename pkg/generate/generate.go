@@ -40,12 +40,25 @@ func (e *elements) UnmarshalYAML(value *yaml.Node) error {
 
 func (e *elements) decodeElements(factor int, value ...*yaml.Node) {
 	for i := 0; i < len(value); i += 1 + factor {
+		headComment := strings.Split(value[i].HeadComment, "\n")
+		for j := range headComment {
+			headComment[j] = strings.Replace(headComment[j], "#", "//", 1)
+		}
+
+		footComment := strings.Split(value[i].FootComment, "\n")
+		for j := range footComment {
+			footComment[j] = strings.Replace(footComment[j], "#", "//", 1)
+		}
+
+		hc := strings.Join(headComment, "\n")
+		fc := strings.Join(footComment, "\n")
+
 		elem := element{
 			Type:        value[i+factor].ShortTag(),
 			Key:         value[i].Value,
 			LineComment: strings.TrimPrefix(value[i+factor].LineComment, "#"),
-			HeadComment: strings.TrimPrefix(value[i].HeadComment, "#"),
-			FootComment: strings.TrimPrefix(value[i].FootComment, "#"),
+			HeadComment: hc,
+			FootComment: fc,
 		}
 
 		switch value[i+factor].Kind {
@@ -141,7 +154,7 @@ var {{ .VarName }} = &unstructured.Unstructured{
 {{- define "element" }}
 	{{- range . }}
 		{{- if .HeadComment }}
-		// {{ .HeadComment }}
+		{{ .HeadComment }}
 		{{- end }}
 		{{- if eq .Type "!!null" }}
 			{{- if ne .IsSeq true }}
@@ -185,7 +198,7 @@ var {{ .VarName }} = &unstructured.Unstructured{
 			{{- end }}
 		{{- end }}
 		{{- if .FootComment }}
-		// {{ .FootComment }}
+		{{ .FootComment }}
 		{{- end }}
 	{{- end }}
 {{- end }}
