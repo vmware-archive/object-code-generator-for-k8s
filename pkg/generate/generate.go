@@ -20,6 +20,7 @@ type element struct {
 	IsSeq       bool
 	LineComment string
 	HeadComment string
+	FootComment string
 	Elements    elements
 }
 
@@ -44,6 +45,7 @@ func (e *elements) decodeElements(factor int, value ...*yaml.Node) {
 			Key:         value[i].Value,
 			LineComment: strings.TrimPrefix(value[i+factor].LineComment, "#"),
 			HeadComment: strings.TrimPrefix(value[i].HeadComment, "#"),
+			FootComment: strings.TrimPrefix(value[i].FootComment, "#"),
 		}
 
 		switch value[i+factor].Kind {
@@ -181,6 +183,9 @@ var {{ .VarName }} = &unstructured.Unstructured{
 					},
 				{{- end }}
 			{{- end }}
+		{{- end }}
+		{{- if .FootComment }}
+		// {{ .FootComment }}
 		{{- end }}
 	{{- end }}
 {{- end }}
