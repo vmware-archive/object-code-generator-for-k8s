@@ -168,12 +168,12 @@ func escapeWithVars(str string) string {
 		return "`" + str + "`"
 	}
 
+	str = strings.ReplaceAll(str, `"`, `\"`)
+
 	if strings.ContainsAny(str, "!!") {
 		str = strings.ReplaceAll(str, "!!start", `" +`)
 		str = strings.ReplaceAll(str, "!!end", `+ "`)
 	}
-
-	str = strings.ReplaceAll(str, `"`, `\"`)
 
 	return `"` + str + `"`
 }
