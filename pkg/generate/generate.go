@@ -148,18 +148,6 @@ func escape(str string) string {
 	if strings.ContainsAny(str, "\n"+`\`) {
 		str = strings.ReplaceAll(str, "`", "` + \"`\" + `")
 
-		return "`" + str + "`"
-	}
-
-	str = strings.ReplaceAll(str, `"`, `\"`)
-
-	return `"` + str + `"`
-}
-
-func escapeWithVars(str string) string {
-	if strings.ContainsAny(str, "\n"+`\`) {
-		str = strings.ReplaceAll(str, "`", "` + \"`\" + `")
-
 		if strings.ContainsAny(str, "!!") {
 			str = strings.ReplaceAll(str, "!!start", "` +")
 			str = strings.ReplaceAll(str, "!!end", "+ `")
@@ -181,7 +169,6 @@ func escapeWithVars(str string) string {
 func funcMap() template.FuncMap {
 	f := sprig.TxtFuncMap()
 	f["escape"] = escape
-	f["escapeWithVars"] = escapeWithVars
 
 	return f
 }
@@ -222,13 +209,6 @@ var {{ .VarName }} = &unstructured.Unstructured{
 			{{- else }}
 				{{ .Value -}},  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
 			{{- end }}
-		{{- else if eq .Type "!!tpl" }}
-			{{- if ne .IsSeq true }}
-				"{{ .Key }}": {{ escapeWithVars .Value -}},  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
-			{{- else }}
-				{{ escapeWithVars .Value -}},  {{ if .LineComment }}// {{ .LineComment }}{{ end }}
-			{{- end }}
-
 		{{- else if eq .Type "!!map" }}
 			{{- if ne .IsSeq true }}
 				"{{ .Key }}": map[string]interface{}{  {{ if .LineComment }}// {{ .LineComment }}{{ end }}

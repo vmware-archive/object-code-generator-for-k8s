@@ -78,10 +78,9 @@ Sometimes you may want to generate code with variable references. To tell the
 generator a value is a variable, you may use a special `!!var` yaml tag on that value.
 
 
-## Nested Variable Reference
+## Variable Reference Inside a string
 Sometimes to may want to generate code with a variable reference inside a string. To tell the 
-generator a value contains a variable inside it, you may use a sepcial `!!tpl` yaml tag on that value.
-afterwards, inside the value use `!!start` to mark the start of the variable and `!!end` to mark the end. the generator will automatically interpolate these and escape quotation marks appropriately
+generator a value contains a variable inside it. Inside the value you may the special tags `!!start` to mark the start of the variable and `!!end` to mark the end. the generator will automatically interpolate these and escape quotation marks appropriately
 ## Example
 
 in this example we will combine templating, variables, and nested variables.  Note that all
@@ -107,7 +106,7 @@ spec:
         spec:
             containers:
               - name: webstore-container
-                image: !!tpl my.private.repo/!!start image !!end  # nested variable reference
+                image: my.private.repo/!!start image !!end  # nested variable reference
                 ports:
                   - containerPort: 8080
 ```
@@ -147,7 +146,7 @@ var test = &unstructured.Unstructured{
 					"containers": []interface{}{
 						map[string]interface{}{
 							"name":  "webstore-container",
-							"image": variable.With.Image.Value,
+							"image": "my.private.repo/" + variable.With.Image.Value + "",
 							"ports": []interface{}{
 								map[string]interface{}{
 									"containerPort": 8080,
