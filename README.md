@@ -1,3 +1,11 @@
+# Important Notice
+
+**🚨🚨 VMware has ended active development of this project, this repository will no longer be updated. 🚨🚨**
+
+Please consider this actively maintained fork: [nukleros/gener8s](https://github.com/nukleros/gener8s)
+
+---
+
 [![Go Reference](https://pkg.go.dev/badge/github.com/vmware-tanzu-labs/object-code-generator-for-k8s.svg)](https://pkg.go.dev/github.com/vmware-tanzu-labs/object-code-generator-for-k8s)
 [![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/vmware-tanzu-labs/object-code-generator-for-k8s)](https://golang.org/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vmware-tanzu-labs/object-code-generator-for-k8s)](https://goreportcard.com/report/github.com/vmware-tanzu-labs/object-code-generator-for-k8s)
